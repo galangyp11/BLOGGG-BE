@@ -1,4 +1,5 @@
 const express = require("express");
+const { ObjectId } = require("mongodb");
 const router = express.Router();
 const User = require("../models/user");
 
@@ -11,6 +12,27 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+router.get("/:id", getOnePost, (req, res) => {
+  // res.send();
+  // res.json();
+});
+
+async function getOnePost(req, res, next) {
+  let post;
+  try {
+    post = await User.findOne({ _id: new ObjectId(req.params.id) });
+
+    if (post == null) {
+      return res.status(404).json({ message: "Post tidak ditemukan" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+
+  res.json(post);
+  next();
+}
 
 router.post("/", async (req, res) => {
   const user = new User({
